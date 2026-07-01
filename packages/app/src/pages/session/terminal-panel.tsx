@@ -2,13 +2,16 @@ import { For, Show, createEffect, createMemo, on, onCleanup, onMount } from "sol
 import { createStore } from "solid-js/store"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { createMediaQuery } from "@solid-primitives/media"
+import { DragDropProvider, PointerSensor } from "@dnd-kit/solid"
+import { isSortable } from "@dnd-kit/solid/sortable"
+import { Accessibility, AutoScroller, Feedback, PointerActivationConstraints } from "@dnd-kit/dom"
+import { RestrictToHorizontalAxis } from "@dnd-kit/abstract/modifiers"
+import { RestrictToElement } from "@dnd-kit/dom/modifiers"
 import { Tabs } from "@opencode-ai/ui/tabs"
 import { ResizeHandle } from "@opencode-ai/ui/resize-handle"
 import { IconButton } from "@opencode-ai/ui/icon-button"
-import { TooltipKeybind } from "@opencode-ai/ui/tooltip"
-import { DragDropProvider, DragDropSensors, DragOverlay, SortableProvider, closestCenter } from "@thisbeyond/solid-dnd"
-import type { DragEvent } from "@thisbeyond/solid-dnd"
-import { ConstrainDragYAxis, getDraggableId } from "@/utils/solid-dnd"
+import { TooltipV2 } from "@opencode-ai/ui/v2/tooltip-v2"
+import { KeybindV2 } from "@opencode-ai/ui/v2/keybind-v2"
 
 import { SortableTerminalTab } from "@/components/session"
 import { Terminal } from "@/components/terminal"
@@ -39,10 +42,10 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
   const height = createMemo(() => layout.terminal.height())
   const close = () => view().terminal.close()
   let root: HTMLDivElement | undefined
+  let tabList: HTMLDivElement | undefined
 
   const [store, setStore] = createStore({
     autoCreated: false,
-    activeDraggable: undefined as string | undefined,
     recovered: {} as Record<string, boolean>,
     view: typeof window === "undefined" ? 1000 : (window.visualViewport?.height ?? window.innerHeight),
   })
@@ -52,6 +55,7 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
   const stacked = createMemo(() => isDesktop() && props.stacked)
   const panelHeight = createMemo(() => (isDesktop() ? (stacked() ? `${pane()}px` : "100%") : opened() ? `${pane()}px` : "0px"))
   const contentHeight = createMemo(() => (isDesktop() ? (stacked() ? `${pane()}px` : "100%") : `${pane()}px`))
+  const newTerminalKeybind = createMemo(() => command.keybindParts("terminal.new"))
 
   onMount(() => {
     if (typeof window === "undefined") return
@@ -170,27 +174,7 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
     trim(id)
   }
 
-  const handleTerminalDragStart = (event: unknown) => {
-    const id = getDraggableId(event)
-    if (!id) return
-    setStore("activeDraggable", id)
-  }
-
-  const handleTerminalDragOver = (event: DragEvent) => {
-    const { draggable, droppable } = event
-    if (!draggable || !droppable) return
-
-    const terminals = terminal.all()
-    const fromIndex = terminals.findIndex((t) => t.id === draggable.id.toString())
-    const toIndex = terminals.findIndex((t) => t.id === droppable.id.toString())
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      terminal.move(draggable.id.toString(), toIndex)
-    }
-  }
-
   const handleTerminalDragEnd = () => {
-    setStore("activeDraggable", undefined)
-
     const activeId = terminal.active()
     if (!activeId) return
     requestAnimationFrame(() => {
@@ -268,28 +252,47 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
           }
         >
           <DragDropProvider
-            onDragStart={handleTerminalDragStart}
-            onDragEnd={handleTerminalDragEnd}
-            onDragOver={handleTerminalDragOver}
-            collisionDetector={closestCenter}
+            sensors={[
+              PointerSensor.configure({
+                activationConstraints: [new PointerActivationConstraints.Distance({ value: 4 })],
+                preventActivation: (event) =>
+                  event.target instanceof Element &&
+                  !!event.target.closest('[data-slot="tabs-trigger-close-button"], input, [contenteditable="true"]'),
+              }),
+            ]}
+            modifiers={[RestrictToHorizontalAxis, RestrictToElement.configure({ element: () => tabList ?? null })]}
+            plugins={(defaults) => [
+              ...defaults.filter((plugin) => plugin !== Accessibility),
+              AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
+              Feedback.configure({ dropAnimation: null }),
+            ]}
+            onDragEnd={(event) => {
+              const source = event.operation.source
+              if (!event.canceled && isSortable(source) && source.initialIndex !== source.index) {
+                terminal.move(source.id.toString(), source.index)
+              }
+              handleTerminalDragEnd()
+            }}
           >
-            <DragDropSensors />
-            <ConstrainDragYAxis />
             <div class="flex flex-col h-full">
               <Tabs
-                variant="alt"
                 value={terminal.active()}
                 onChange={(id) => terminal.open(id)}
-                class="!h-auto !flex-none"
+                class="!h-[52px] !flex-none"
               >
-                <Tabs.List class="h-10 border-b border-border-weaker-base">
-                  <SortableProvider ids={ids()}>
-                    <For each={all()}>{(pty) => <SortableTerminalTab terminal={pty} onClose={close} />}</For>
-                  </SortableProvider>
+                <Tabs.List ref={tabList}>
+                  <For each={all()}>{(pty, index) => <SortableTerminalTab terminal={pty} index={index} onClose={close} />}</For>
                   <div class="h-full flex items-center justify-center">
-                    <TooltipKeybind
-                      title={language.t("command.terminal.new")}
-                      keybind={command.keybind("terminal.new")}
+                    <TooltipV2
+                      value={
+                        <>
+                          {language.t("command.terminal.new")}
+                          <Show when={newTerminalKeybind().length > 0}>
+                            <KeybindV2 keys={newTerminalKeybind()} variant="neutral" />
+                          </Show>
+                        </>
+                      }
+                      placement="bottom"
                       class="flex items-center"
                     >
                       <IconButton
@@ -299,7 +302,7 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
                         onClick={terminal.new}
                         aria-label={language.t("command.terminal.new")}
                       />
-                    </TooltipKeybind>
+                    </TooltipV2>
                   </div>
                 </Tabs.List>
               </Tabs>
@@ -326,23 +329,6 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
                 </Show>
               </div>
             </div>
-            <DragOverlay>
-              <Show when={store.activeDraggable} keyed>
-                {(id) => (
-                  <Show when={all().find((pty) => pty.id === id)}>
-                    {(t) => (
-                      <div class="relative p-1 h-10 flex items-center bg-background-stronger text-14-regular">
-                        {terminalTabLabel({
-                          title: t().title,
-                          titleNumber: t().titleNumber,
-                          t: language.t as (key: string, vars?: Record<string, string | number | boolean>) => string,
-                        })}
-                      </div>
-                    )}
-                  </Show>
-                )}
-              </Show>
-            </DragOverlay>
           </DragDropProvider>
         </Show>
       </div>
