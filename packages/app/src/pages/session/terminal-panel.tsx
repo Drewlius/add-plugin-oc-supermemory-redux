@@ -319,6 +319,7 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
                             <Terminal
                               pty={pty()}
                               autoFocus={opened()}
+                              class="!px-[14px]"
                               onConnect={() => markTerminalConnected(terminalRecoveryKey(pty()), id, ops.trim)}
                               onCleanup={ops.update}
                               onConnectError={() => recoverTerminal(terminalRecoveryKey(pty()), id, ops.clone)}
