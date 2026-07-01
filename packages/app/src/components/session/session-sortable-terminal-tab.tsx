@@ -14,8 +14,6 @@ import { useLanguage } from "@/context/language"
 import { useCommand } from "@/context/command"
 import { focusTerminalById } from "@/pages/session/helpers"
 
-const sortableTransition = { duration: 0 }
-
 export function SortableTerminalTab(props: {
   terminal: LocalPTY
   index: () => number
@@ -32,7 +30,6 @@ export function SortableTerminalTab(props: {
     get index() {
       return props.index()
     },
-    transition: sortableTransition,
   })
   const [store, setStore] = createStore({
     editing: false,
@@ -240,7 +237,12 @@ export function SortableTerminalTab(props: {
               hideCloseButton
               onMiddleClick={close}
             >
-              <span class="truncate" data-slot="terminal-tab-title" onDblClick={edit} classList={{ invisible: store.editing }}>
+              <span
+                class="truncate"
+                data-slot="terminal-tab-title"
+                onDblClick={edit}
+                classList={{ invisible: store.editing }}
+              >
                 {label()}
               </span>
             </Tabs.Trigger>
