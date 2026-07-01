@@ -427,8 +427,13 @@ export default function Page() {
   const size = createSizing()
   const desktopReviewOpen = createMemo(() => isDesktop() && view().reviewPanel.opened())
   const desktopTerminalOpen = createMemo(() => isDesktop() && view().terminal.opened())
-  const desktopReviewAndTerminalOpen = createMemo(() => desktopReviewOpen() && desktopTerminalOpen())
-  const desktopTerminalOnlyOpen = createMemo(() => desktopTerminalOpen() && !desktopReviewOpen())
+  const desktopStackedReviewAndTerminalOpen = createMemo(
+    () => newSessionDesign() && desktopReviewOpen() && desktopTerminalOpen(),
+  )
+  const desktopBottomTerminalOpen = createMemo(() => !newSessionDesign() && desktopTerminalOpen())
+  const desktopInlineTerminalOnlyOpen = createMemo(
+    () => newSessionDesign() && desktopTerminalOpen() && !desktopReviewOpen(),
+  )
   const desktopFileTreeOpen = createMemo(
     () =>
       isDesktop() &&
@@ -437,7 +442,9 @@ export default function Page() {
         opened: layout.fileTree.opened(),
       }),
   )
-  const desktopSessionResizeOpen = createMemo(() => desktopReviewOpen() || desktopTerminalOpen())
+  const desktopSessionResizeOpen = createMemo(
+    () => desktopReviewOpen() || (newSessionDesign() && desktopTerminalOpen()),
+  )
   const desktopSidePanelOpen = createMemo(() => desktopSessionResizeOpen() || desktopFileTreeOpen())
   const sessionPanelWidth = createMemo(() => {
     if (!desktopSidePanelOpen()) return "100%"
@@ -2012,7 +2019,7 @@ export default function Page() {
           classList={{
             "@container relative shrink-0 flex flex-col min-h-0 h-full flex-1 md:flex-none transition-[width]": true,
             "duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[width] motion-reduce:transition-none":
-              !size.active() && !ui.reviewSnap && !desktopTerminalOnlyOpen(),
+              !size.active() && !ui.reviewSnap && !desktopInlineTerminalOnlyOpen(),
           }}
           style={{
             width: sessionPanelWidth(),
@@ -2046,7 +2053,7 @@ export default function Page() {
         </div>
 
         <Show
-          when={desktopReviewAndTerminalOpen()}
+          when={desktopStackedReviewAndTerminalOpen()}
           fallback={
             <>
               <Show when={!isDesktop() || desktopReviewOpen() || desktopFileTreeOpen()}>
@@ -2065,7 +2072,7 @@ export default function Page() {
                 />
               </Show>
 
-              <Show when={!isDesktop() || desktopTerminalOpen()}>
+              <Show when={!isDesktop() || (desktopTerminalOpen() && !desktopBottomTerminalOpen())}>
                 <TerminalPanel />
               </Show>
             </>
@@ -2105,6 +2112,23 @@ export default function Page() {
           </div>
         </Show>
       </div>
+
+      <Show when={desktopBottomTerminalOpen()}>
+        <div class="relative h-0 shrink-0" onPointerDown={() => size.start()}>
+          <ResizeHandle
+            direction="vertical"
+            size={layout.terminal.height()}
+            min={100}
+            max={typeof window === "undefined" ? 600 : window.innerHeight * 0.6}
+            onResize={(height) => {
+              size.touch()
+              layout.terminal.resize(height)
+            }}
+          />
+        </div>
+
+        <TerminalPanel stacked />
+      </Show>
     </SessionRouteFrame>
   )
 }
