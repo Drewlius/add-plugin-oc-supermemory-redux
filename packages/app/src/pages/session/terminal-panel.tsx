@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createMemo, on, onCleanup, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { makeEventListener } from "@solid-primitives/event-listener"
+import { createMediaQuery } from "@solid-primitives/media"
 import { Tabs } from "@opencode-ai/ui/tabs"
 import { ResizeHandle } from "@opencode-ai/ui/resize-handle"
 import { IconButton } from "@opencode-ai/ui/icon-button"
@@ -22,7 +23,7 @@ import { createSizing, focusTerminalById } from "@/pages/session/helpers"
 import { getTerminalHandoff, setTerminalHandoff } from "@/pages/session/handoff"
 import { useSessionLayout } from "@/pages/session/session-layout"
 
-export function TerminalPanel() {
+export function TerminalPanel(props: { stacked?: boolean } = {}) {
   const delays = [120, 240]
   const layout = useLayout()
   const terminal = useTerminal()
@@ -32,6 +33,7 @@ export function TerminalPanel() {
   const settings = useSettings()
   const { workspaceKey, view } = useSessionLayout()
 
+  const isDesktop = createMediaQuery("(min-width: 768px)")
   const opened = createMemo(() => view().terminal.opened())
   const size = createSizing()
   const height = createMemo(() => layout.terminal.height())
@@ -47,6 +49,9 @@ export function TerminalPanel() {
 
   const max = () => store.view * 0.6
   const pane = () => Math.min(height(), max())
+  const stacked = createMemo(() => isDesktop() && props.stacked)
+  const panelHeight = createMemo(() => (isDesktop() ? (stacked() ? `${pane()}px` : "100%") : opened() ? `${pane()}px` : "0px"))
+  const contentHeight = createMemo(() => (isDesktop() ? (stacked() ? `${pane()}px` : "100%") : `${pane()}px`))
 
   onMount(() => {
     if (typeof window === "undefined") return
@@ -195,21 +200,25 @@ export function TerminalPanel() {
   }
 
   return (
-    <div
+    <aside
       ref={root}
       id="terminal-panel"
       role="region"
       aria-label={language.t("terminal.title")}
       aria-hidden={!opened()}
       inert={!opened()}
-      class="relative w-full shrink-0 bg-background-stronger"
+      class="relative shrink-0 overflow-hidden bg-background-stronger"
       classList={{
+        "w-full": !isDesktop() || stacked(),
+        "min-w-0 h-full flex-1": isDesktop() && opened() && !stacked(),
+        "w-0 h-full pointer-events-none": isDesktop() && !opened(),
+        "rounded-[10px] shadow-[var(--v2-elevation-raised)]": isDesktop() && settings.general.newLayoutDesigns(),
         "transition-[height] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[height] motion-reduce:transition-none":
-          !size.active(),
+          !isDesktop() && !size.active(),
       }}
-      style={{ height: opened() ? `${pane()}px` : "0px" }}
+      style={{ height: panelHeight() }}
     >
-      <div class="hidden md:block" onPointerDown={() => size.start()}>
+      <div classList={{ "md:hidden": !stacked(), hidden: stacked() }} onPointerDown={() => size.start()}>
         <ResizeHandle
           classList={{
             "-top-1": settings.general.newLayoutDesigns(),
@@ -227,12 +236,14 @@ export function TerminalPanel() {
         />
       </div>
       <div
-        class="absolute inset-x-0 top-0 flex flex-col overflow-hidden"
+        class="absolute inset-0 flex flex-col overflow-hidden"
         classList={{
-          "border-t border-border-weak-base": opened(),
+          "border-t border-border-weak-base": opened() && !isDesktop(),
+          "border-t border-border-weaker-base": opened() && stacked() && !settings.general.newLayoutDesigns(),
+          "border-l border-border-weaker-base": opened() && isDesktop() && !settings.general.newLayoutDesigns(),
           "pointer-events-none": !opened(),
         }}
-        style={{ height: `${pane()}px` }}
+        style={{ height: contentHeight() }}
       >
         <Show
           when={terminal.ready()}
@@ -335,6 +346,6 @@ export function TerminalPanel() {
           </DragDropProvider>
         </Show>
       </div>
-    </div>
+    </aside>
   )
 }
