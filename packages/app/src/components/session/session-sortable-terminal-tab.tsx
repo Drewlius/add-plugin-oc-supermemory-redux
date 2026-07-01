@@ -62,6 +62,7 @@ export function SortableTerminalTab(props: { terminal: LocalPTY; index: () => nu
 
   const focus = () => {
     if (store.editing) return
+    terminal.open(props.terminal.id)
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     focusTerminalById(props.terminal.id)
   }

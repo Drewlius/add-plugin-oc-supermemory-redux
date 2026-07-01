@@ -280,8 +280,10 @@ export function TerminalPanel(props: { stacked?: boolean } = {}) {
                 onChange={(id) => terminal.open(id)}
                 class="!h-[52px] !flex-none"
               >
-                <Tabs.List ref={tabList}>
-                  <For each={all()}>{(pty, index) => <SortableTerminalTab terminal={pty} index={index} onClose={close} />}</For>
+                <Tabs.List>
+                  <div ref={tabList} class="h-full min-w-0 flex items-center gap-2">
+                    <For each={all()}>{(pty, index) => <SortableTerminalTab terminal={pty} index={index} onClose={close} />}</For>
+                  </div>
                   <div class="h-full flex items-center justify-center">
                     <TooltipV2
                       value={
