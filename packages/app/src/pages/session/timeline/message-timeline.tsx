@@ -1375,14 +1375,22 @@ export function MessageTimeline(props: {
                     <button
                       type="button"
                       data-slot="session-title-parent"
-                      class="min-w-0 max-w-[40%] truncate text-14-medium text-text-weak transition-colors hover:text-text-base"
+                      classList={{
+                        "min-w-0 max-w-[40%] truncate text-14-medium transition-colors hover:text-text-base": true,
+                        "pl-2 text-v2-text-text-faint": settings.general.newLayoutDesigns(),
+                        "text-text-weak": !settings.general.newLayoutDesigns(),
+                      }}
                       onClick={navigateParent}
                     >
                       {parentTitle()}
                     </button>
                     <span
                       data-slot="session-title-separator"
-                      class="px-2 text-14-medium text-text-weak"
+                      classList={{
+                        "text-14-medium": true,
+                        "pl-2 pr-1 text-v2-text-text-faint": settings.general.newLayoutDesigns(),
+                        "px-2 text-text-weak": !settings.general.newLayoutDesigns(),
+                      }}
                       aria-hidden="true"
                     >
                       /
