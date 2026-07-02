@@ -28,9 +28,6 @@ export function DesktopFirstLaunchOnboarding(props: { initialUrl: string; onLoad
           (p) => p ?? Promise.resolve(),
         ),
       )
-      if (!server.ready() || !layout.ready() || !tabs.ready() || !tabs.recentReady()) return
-      if (!server.isLocal()) return
-      if (!serverSync().ready) return
 
       const pending = await window.api.isFirstLaunchOnboardingPending()
       if (!pending) return
