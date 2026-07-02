@@ -79,6 +79,12 @@ type PlatformBase = {
   /** Set the default server URL to use on app startup (platform-specific) */
   setDefaultServer?(url: ServerConnection.Key | null): Promise<void> | void
 
+  /** Whether desktop should evaluate first-launch default project onboarding. */
+  isFirstLaunchOnboardingPending?(): Promise<boolean> | boolean
+
+  /** Marks first-launch onboarding complete and optionally creates the default project. */
+  finishFirstLaunchOnboarding?(createDefaultProject: boolean): Promise<string | null> | string | null
+
   /** Manage WSL sidecar servers (Electron on Windows only) */
   wslServers?: WslServersPlatform
 

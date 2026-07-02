@@ -9,7 +9,7 @@ import { Font } from "@opencode-ai/ui/font"
 import { Splash } from "@opencode-ai/ui/logo"
 import { ThemeProvider } from "@opencode-ai/ui/theme/context"
 import { MetaProvider } from "@solidjs/meta"
-import { type BaseRouterProps, Navigate, Route, Router, useParams, useSearchParams } from "@solidjs/router"
+import { type BaseRouterProps, Navigate, Route, Router, useLocation, useNavigate, useParams, useSearchParams } from "@solidjs/router"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
 import { Effect } from "effect"
 import {
@@ -31,12 +31,12 @@ import { Dynamic } from "solid-js/web"
 import { CommandProvider, useCommand, type CommandOption } from "@/context/command"
 import { CommentsProvider } from "@/context/comments"
 import { FileProvider } from "@/context/file"
-import { ServerSDKProvider } from "@/context/server-sdk"
-import { ServerSyncProvider } from "@/context/server-sync"
+import { useServerSDK, ServerSDKProvider } from "@/context/server-sdk"
+import { useServerSync, ServerSyncProvider } from "@/context/server-sync"
 import { GlobalProvider, useGlobal } from "@/context/global"
 import { HighlightsProvider } from "@/context/highlights"
 import { LanguageProvider, type Locale, useLanguage } from "@/context/language"
-import { LayoutProvider } from "@/context/layout"
+import { useLayout, LayoutProvider } from "@/context/layout"
 import { ModelsProvider } from "@/context/models"
 import { NotificationProvider } from "@/context/notification"
 import { PermissionProvider } from "@/context/permission"
@@ -56,6 +56,8 @@ import { legacySessionServer, requireServerKey, sessionHref } from "./utils/sess
 
 import { SessionPage, TargetSessionRoute as TargetSessionRouteContent } from "@/pages/session"
 import { NewHome, LegacyHome } from "@/pages/home"
+import { base64Encode } from "@opencode-ai/core/util/encode"
+import { useProviders } from "./hooks/use-providers"
 
 const NewSession = lazy(() => import("@/pages/new-session"))
 
@@ -266,10 +268,61 @@ function ServerScopedProviders(props: ServerScopedShellProps) {
   return (
     <PermissionProvider directory={props.directory}>
       <LayoutProvider>
+        <DesktopFirstLaunchOnboarding />
         <ModelsProvider directory={props.directory}>{props.children}</ModelsProvider>
       </LayoutProvider>
     </PermissionProvider>
   )
+}
+
+function DesktopFirstLaunchOnboarding() {
+  const platform = usePlatform()
+  const server = useServer()
+  const serverSDK = useServerSDK()
+  const serverSync = useServerSync()
+  const global = useGlobal()
+  const layout = useLayout()
+  const providers = useProviders()
+  const navigate = useNavigate()
+  const location = useLocation()
+  let checked = false
+
+  createEffect(() => {
+    if (checked) return
+    if (platform.platform !== "desktop") return
+    if (!platform.isFirstLaunchOnboardingPending || !platform.finishFirstLaunchOnboarding) return
+    if (!server.ready() || !server.isLocal() || !serverSync().ready) return
+
+    checked = true
+    void (async () => {
+      const pending = await platform.isFirstLaunchOnboardingPending?.()
+      if (!pending) return
+
+      const sessions = await serverSDK()
+        .client.session.list()
+        .then((x) => x.data ?? [])
+        .catch(() => undefined)
+      const empty =
+        location.pathname === "/" &&
+        sessions?.length === 0 &&
+        providers.connected().length === 0 &&
+        serverSync().data.project.length === 0 &&
+        layout.projects.list().length === 0 &&
+        global.servers.list().every(ServerConnection.builtin)
+      const defaultProject = await platform.finishFirstLaunchOnboarding?.(empty)
+      if (!empty || !defaultProject) return
+
+      const conn = server.current
+      if (conn) {
+        const ctx = global.ensureServerCtx(conn)
+        ctx.projects.open(defaultProject)
+        ctx.projects.touch(defaultProject)
+      }
+      navigate(`/${base64Encode(defaultProject)}/session`, { replace: true })
+    })()
+  })
+
+  return null
 }
 
 function LegacyServerScopedShell(props: ServerScopedShellProps) {

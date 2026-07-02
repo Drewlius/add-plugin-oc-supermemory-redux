@@ -274,6 +274,11 @@ const createPlatform = (windowState: DesktopWindowState): Platform => {
       await window.api.setDefaultServerUrl(url)
     },
 
+    isFirstLaunchOnboardingPending: () => window.api.isFirstLaunchOnboardingPending(),
+
+    finishFirstLaunchOnboarding: (createDefaultProject: boolean) =>
+      window.api.finishFirstLaunchOnboarding(createDefaultProject),
+
     wslServers: wslServersApi,
 
     getDisplayBackend: async () => {
