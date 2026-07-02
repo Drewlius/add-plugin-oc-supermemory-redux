@@ -53,6 +53,7 @@ import { IconButton } from "@opencode-ai/ui/icon-button"
 import { Icon as IconV2 } from "@opencode-ai/ui/v2/icon"
 import { IconButtonV2 } from "@opencode-ai/ui/v2/icon-button-v2"
 import { TooltipV2 } from "@opencode-ai/ui/v2/tooltip-v2"
+import { Spinner } from "@opencode-ai/ui/spinner"
 import { TextShimmer } from "@opencode-ai/ui/text-shimmer"
 import { AnimatedCountList } from "./tool-count-summary"
 import { ToolStatusTitle } from "./tool-status-title"
@@ -451,6 +452,10 @@ function taskAgent(
 function agentColor(value: string | undefined, themeColors: Record<string, string>) {
   if (!value) return
   return themeColors[value] ?? value
+}
+
+function newLayout() {
+  return typeof document !== "undefined" && document.body.hasAttribute("data-new-layout")
 }
 
 function webSearchProviderLabel(provider: unknown) {
@@ -1954,7 +1959,9 @@ ToolRegistry.register({
           <div data-slot="basic-tool-tool-info-main">
             <Show when={running()}>
               <span data-component="task-tool-spinner" style={{ color: tone() ?? "var(--icon-interactive-base)" }}>
-                <SessionProgressIndicatorV2 style={{ color: v2Tone() ?? "light-dark(var(--v2-text-text-base), #ffffff)" }} />
+                <Show when={newLayout()} fallback={<Spinner />}>
+                  <SessionProgressIndicatorV2 style={{ color: v2Tone() ?? "light-dark(var(--v2-text-text-base), #ffffff)" }} />
+                </Show>
               </span>
             </Show>
             <span data-component="task-tool-title">{title()}</span>
