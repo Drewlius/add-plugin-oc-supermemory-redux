@@ -557,25 +557,98 @@ type Endpoint13_0Input = { readonly location?: Endpoint13_0Request["query"]["loc
 const Endpoint13_0 = (raw: RawClient["server.form"]) => (input?: Endpoint13_0Input) =>
   raw["form.request.list"]({ query: { location: input?.["location"] } }).pipe(Effect.mapError(mapClientError))
 
-type Endpoint13_1Request = Parameters<RawClient["server.form"]["session.form.list"]>[0]
-type Endpoint13_1Input = { readonly sessionID: Endpoint13_1Request["params"]["sessionID"] }
+type Endpoint13_1Request = Parameters<RawClient["server.form"]["form.create"]>[0]
+type Endpoint13_1Input = {
+  readonly location?: Endpoint13_1Request["query"]["location"]
+  readonly id?: Endpoint13_1Request["payload"]["id"]
+  readonly title?: Endpoint13_1Request["payload"]["title"]
+  readonly metadata?: Endpoint13_1Request["payload"]["metadata"]
+  readonly mode: Endpoint13_1Request["payload"]["mode"]
+  readonly fields?: Endpoint13_1Request["payload"]["fields"]
+  readonly url?: Endpoint13_1Request["payload"]["url"]
+  readonly sessionID: Endpoint13_1Request["payload"]["sessionID"]
+}
 const Endpoint13_1 = (raw: RawClient["server.form"]) => (input: Endpoint13_1Input) =>
+  raw["form.create"]({
+    query: { location: input["location"] },
+    payload: {
+      id: input["id"],
+      title: input["title"],
+      metadata: input["metadata"],
+      mode: input["mode"],
+      fields: input["fields"],
+      url: input["url"],
+      sessionID: input["sessionID"],
+    },
+  }).pipe(
+    Effect.mapError(mapClientError),
+    Effect.map((value) => value.data),
+  )
+
+type Endpoint13_2Request = Parameters<RawClient["server.form"]["form.get"]>[0]
+type Endpoint13_2Input = {
+  readonly formID: Endpoint13_2Request["params"]["formID"]
+  readonly location?: Endpoint13_2Request["query"]["location"]
+}
+const Endpoint13_2 = (raw: RawClient["server.form"]) => (input: Endpoint13_2Input) =>
+  raw["form.get"]({ params: { formID: input["formID"] }, query: { location: input["location"] } }).pipe(
+    Effect.mapError(mapClientError),
+    Effect.map((value) => value.data),
+  )
+
+type Endpoint13_3Request = Parameters<RawClient["server.form"]["form.state"]>[0]
+type Endpoint13_3Input = {
+  readonly formID: Endpoint13_3Request["params"]["formID"]
+  readonly location?: Endpoint13_3Request["query"]["location"]
+}
+const Endpoint13_3 = (raw: RawClient["server.form"]) => (input: Endpoint13_3Input) =>
+  raw["form.state"]({ params: { formID: input["formID"] }, query: { location: input["location"] } }).pipe(
+    Effect.mapError(mapClientError),
+    Effect.map((value) => value.data),
+  )
+
+type Endpoint13_4Request = Parameters<RawClient["server.form"]["form.reply"]>[0]
+type Endpoint13_4Input = {
+  readonly formID: Endpoint13_4Request["params"]["formID"]
+  readonly location?: Endpoint13_4Request["query"]["location"]
+  readonly answer: Endpoint13_4Request["payload"]["answer"]
+}
+const Endpoint13_4 = (raw: RawClient["server.form"]) => (input: Endpoint13_4Input) =>
+  raw["form.reply"]({
+    params: { formID: input["formID"] },
+    query: { location: input["location"] },
+    payload: { answer: input["answer"] },
+  }).pipe(Effect.mapError(mapClientError))
+
+type Endpoint13_5Request = Parameters<RawClient["server.form"]["form.cancel"]>[0]
+type Endpoint13_5Input = {
+  readonly formID: Endpoint13_5Request["params"]["formID"]
+  readonly location?: Endpoint13_5Request["query"]["location"]
+}
+const Endpoint13_5 = (raw: RawClient["server.form"]) => (input: Endpoint13_5Input) =>
+  raw["form.cancel"]({ params: { formID: input["formID"] }, query: { location: input["location"] } }).pipe(
+    Effect.mapError(mapClientError),
+  )
+
+type Endpoint13_6Request = Parameters<RawClient["server.form"]["session.form.list"]>[0]
+type Endpoint13_6Input = { readonly sessionID: Endpoint13_6Request["params"]["sessionID"] }
+const Endpoint13_6 = (raw: RawClient["server.form"]) => (input: Endpoint13_6Input) =>
   raw["session.form.list"]({ params: { sessionID: input["sessionID"] } }).pipe(
     Effect.mapError(mapClientError),
     Effect.map((value) => value.data),
   )
 
-type Endpoint13_2Request = Parameters<RawClient["server.form"]["session.form.create"]>[0]
-type Endpoint13_2Input = {
-  readonly sessionID: Endpoint13_2Request["params"]["sessionID"]
-  readonly id?: Endpoint13_2Request["payload"]["id"]
-  readonly title?: Endpoint13_2Request["payload"]["title"]
-  readonly metadata?: Endpoint13_2Request["payload"]["metadata"]
-  readonly mode: Endpoint13_2Request["payload"]["mode"]
-  readonly fields?: Endpoint13_2Request["payload"]["fields"]
-  readonly url?: Endpoint13_2Request["payload"]["url"]
+type Endpoint13_7Request = Parameters<RawClient["server.form"]["session.form.create"]>[0]
+type Endpoint13_7Input = {
+  readonly sessionID: Endpoint13_7Request["params"]["sessionID"]
+  readonly id?: Endpoint13_7Request["payload"]["id"]
+  readonly title?: Endpoint13_7Request["payload"]["title"]
+  readonly metadata?: Endpoint13_7Request["payload"]["metadata"]
+  readonly mode: Endpoint13_7Request["payload"]["mode"]
+  readonly fields?: Endpoint13_7Request["payload"]["fields"]
+  readonly url?: Endpoint13_7Request["payload"]["url"]
 }
-const Endpoint13_2 = (raw: RawClient["server.form"]) => (input: Endpoint13_2Input) =>
+const Endpoint13_7 = (raw: RawClient["server.form"]) => (input: Endpoint13_7Input) =>
   raw["session.form.create"]({
     params: { sessionID: input["sessionID"] },
     payload: {
@@ -591,58 +664,63 @@ const Endpoint13_2 = (raw: RawClient["server.form"]) => (input: Endpoint13_2Inpu
     Effect.map((value) => value.data),
   )
 
-type Endpoint13_3Request = Parameters<RawClient["server.form"]["session.form.get"]>[0]
-type Endpoint13_3Input = {
-  readonly sessionID: Endpoint13_3Request["params"]["sessionID"]
-  readonly formID: Endpoint13_3Request["params"]["formID"]
+type Endpoint13_8Request = Parameters<RawClient["server.form"]["session.form.get"]>[0]
+type Endpoint13_8Input = {
+  readonly sessionID: Endpoint13_8Request["params"]["sessionID"]
+  readonly formID: Endpoint13_8Request["params"]["formID"]
 }
-const Endpoint13_3 = (raw: RawClient["server.form"]) => (input: Endpoint13_3Input) =>
+const Endpoint13_8 = (raw: RawClient["server.form"]) => (input: Endpoint13_8Input) =>
   raw["session.form.get"]({ params: { sessionID: input["sessionID"], formID: input["formID"] } }).pipe(
     Effect.mapError(mapClientError),
     Effect.map((value) => value.data),
   )
 
-type Endpoint13_4Request = Parameters<RawClient["server.form"]["session.form.state"]>[0]
-type Endpoint13_4Input = {
-  readonly sessionID: Endpoint13_4Request["params"]["sessionID"]
-  readonly formID: Endpoint13_4Request["params"]["formID"]
+type Endpoint13_9Request = Parameters<RawClient["server.form"]["session.form.state"]>[0]
+type Endpoint13_9Input = {
+  readonly sessionID: Endpoint13_9Request["params"]["sessionID"]
+  readonly formID: Endpoint13_9Request["params"]["formID"]
 }
-const Endpoint13_4 = (raw: RawClient["server.form"]) => (input: Endpoint13_4Input) =>
+const Endpoint13_9 = (raw: RawClient["server.form"]) => (input: Endpoint13_9Input) =>
   raw["session.form.state"]({ params: { sessionID: input["sessionID"], formID: input["formID"] } }).pipe(
     Effect.mapError(mapClientError),
     Effect.map((value) => value.data),
   )
 
-type Endpoint13_5Request = Parameters<RawClient["server.form"]["session.form.reply"]>[0]
-type Endpoint13_5Input = {
-  readonly sessionID: Endpoint13_5Request["params"]["sessionID"]
-  readonly formID: Endpoint13_5Request["params"]["formID"]
-  readonly answer: Endpoint13_5Request["payload"]["answer"]
+type Endpoint13_10Request = Parameters<RawClient["server.form"]["session.form.reply"]>[0]
+type Endpoint13_10Input = {
+  readonly sessionID: Endpoint13_10Request["params"]["sessionID"]
+  readonly formID: Endpoint13_10Request["params"]["formID"]
+  readonly answer: Endpoint13_10Request["payload"]["answer"]
 }
-const Endpoint13_5 = (raw: RawClient["server.form"]) => (input: Endpoint13_5Input) =>
+const Endpoint13_10 = (raw: RawClient["server.form"]) => (input: Endpoint13_10Input) =>
   raw["session.form.reply"]({
     params: { sessionID: input["sessionID"], formID: input["formID"] },
     payload: { answer: input["answer"] },
   }).pipe(Effect.mapError(mapClientError))
 
-type Endpoint13_6Request = Parameters<RawClient["server.form"]["session.form.cancel"]>[0]
-type Endpoint13_6Input = {
-  readonly sessionID: Endpoint13_6Request["params"]["sessionID"]
-  readonly formID: Endpoint13_6Request["params"]["formID"]
+type Endpoint13_11Request = Parameters<RawClient["server.form"]["session.form.cancel"]>[0]
+type Endpoint13_11Input = {
+  readonly sessionID: Endpoint13_11Request["params"]["sessionID"]
+  readonly formID: Endpoint13_11Request["params"]["formID"]
 }
-const Endpoint13_6 = (raw: RawClient["server.form"]) => (input: Endpoint13_6Input) =>
+const Endpoint13_11 = (raw: RawClient["server.form"]) => (input: Endpoint13_11Input) =>
   raw["session.form.cancel"]({ params: { sessionID: input["sessionID"], formID: input["formID"] } }).pipe(
     Effect.mapError(mapClientError),
   )
 
 const adaptGroup13 = (raw: RawClient["server.form"]) => ({
   listRequests: Endpoint13_0(raw),
-  list: Endpoint13_1(raw),
-  create: Endpoint13_2(raw),
-  get: Endpoint13_3(raw),
-  state: Endpoint13_4(raw),
-  reply: Endpoint13_5(raw),
-  cancel: Endpoint13_6(raw),
+  createGlobal: Endpoint13_1(raw),
+  getGlobal: Endpoint13_2(raw),
+  stateGlobal: Endpoint13_3(raw),
+  replyGlobal: Endpoint13_4(raw),
+  cancelGlobal: Endpoint13_5(raw),
+  list: Endpoint13_6(raw),
+  create: Endpoint13_7(raw),
+  get: Endpoint13_8(raw),
+  state: Endpoint13_9(raw),
+  reply: Endpoint13_10(raw),
+  cancel: Endpoint13_11(raw),
 })
 
 type Endpoint14_0Request = Parameters<RawClient["server.permission"]["permission.request.list"]>[0]

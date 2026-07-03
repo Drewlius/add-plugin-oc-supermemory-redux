@@ -463,59 +463,111 @@ export type Endpoint13_0Input = { readonly location?: Endpoint13_0Request["query
 export type Endpoint13_0Output = EffectValue<ReturnType<RawClient["server.form"]["form.request.list"]>>
 export type FormListRequestsOperation<E = never> = (input?: Endpoint13_0Input) => Effect.Effect<Endpoint13_0Output, E>
 
-type Endpoint13_1Request = Parameters<RawClient["server.form"]["session.form.list"]>[0]
-export type Endpoint13_1Input = { readonly sessionID: Endpoint13_1Request["params"]["sessionID"] }
-export type Endpoint13_1Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.list"]>>["data"]
-export type FormListOperation<E = never> = (input: Endpoint13_1Input) => Effect.Effect<Endpoint13_1Output, E>
+type Endpoint13_1Request = Parameters<RawClient["server.form"]["form.create"]>[0]
+export type Endpoint13_1Input = {
+  readonly location?: Endpoint13_1Request["query"]["location"]
+  readonly id?: Endpoint13_1Request["payload"]["id"]
+  readonly title?: Endpoint13_1Request["payload"]["title"]
+  readonly metadata?: Endpoint13_1Request["payload"]["metadata"]
+  readonly mode: Endpoint13_1Request["payload"]["mode"]
+  readonly fields?: Endpoint13_1Request["payload"]["fields"]
+  readonly url?: Endpoint13_1Request["payload"]["url"]
+  readonly sessionID: Endpoint13_1Request["payload"]["sessionID"]
+}
+export type Endpoint13_1Output = EffectValue<ReturnType<RawClient["server.form"]["form.create"]>>["data"]
+export type FormCreateGlobalOperation<E = never> = (input: Endpoint13_1Input) => Effect.Effect<Endpoint13_1Output, E>
 
-type Endpoint13_2Request = Parameters<RawClient["server.form"]["session.form.create"]>[0]
+type Endpoint13_2Request = Parameters<RawClient["server.form"]["form.get"]>[0]
 export type Endpoint13_2Input = {
-  readonly sessionID: Endpoint13_2Request["params"]["sessionID"]
-  readonly id?: Endpoint13_2Request["payload"]["id"]
-  readonly title?: Endpoint13_2Request["payload"]["title"]
-  readonly metadata?: Endpoint13_2Request["payload"]["metadata"]
-  readonly mode: Endpoint13_2Request["payload"]["mode"]
-  readonly fields?: Endpoint13_2Request["payload"]["fields"]
-  readonly url?: Endpoint13_2Request["payload"]["url"]
+  readonly formID: Endpoint13_2Request["params"]["formID"]
+  readonly location?: Endpoint13_2Request["query"]["location"]
 }
-export type Endpoint13_2Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.create"]>>["data"]
-export type FormCreateOperation<E = never> = (input: Endpoint13_2Input) => Effect.Effect<Endpoint13_2Output, E>
+export type Endpoint13_2Output = EffectValue<ReturnType<RawClient["server.form"]["form.get"]>>["data"]
+export type FormGetGlobalOperation<E = never> = (input: Endpoint13_2Input) => Effect.Effect<Endpoint13_2Output, E>
 
-type Endpoint13_3Request = Parameters<RawClient["server.form"]["session.form.get"]>[0]
+type Endpoint13_3Request = Parameters<RawClient["server.form"]["form.state"]>[0]
 export type Endpoint13_3Input = {
-  readonly sessionID: Endpoint13_3Request["params"]["sessionID"]
   readonly formID: Endpoint13_3Request["params"]["formID"]
+  readonly location?: Endpoint13_3Request["query"]["location"]
 }
-export type Endpoint13_3Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.get"]>>["data"]
-export type FormGetOperation<E = never> = (input: Endpoint13_3Input) => Effect.Effect<Endpoint13_3Output, E>
+export type Endpoint13_3Output = EffectValue<ReturnType<RawClient["server.form"]["form.state"]>>["data"]
+export type FormStateGlobalOperation<E = never> = (input: Endpoint13_3Input) => Effect.Effect<Endpoint13_3Output, E>
 
-type Endpoint13_4Request = Parameters<RawClient["server.form"]["session.form.state"]>[0]
+type Endpoint13_4Request = Parameters<RawClient["server.form"]["form.reply"]>[0]
 export type Endpoint13_4Input = {
-  readonly sessionID: Endpoint13_4Request["params"]["sessionID"]
   readonly formID: Endpoint13_4Request["params"]["formID"]
+  readonly location?: Endpoint13_4Request["query"]["location"]
+  readonly answer: Endpoint13_4Request["payload"]["answer"]
 }
-export type Endpoint13_4Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.state"]>>["data"]
-export type FormStateOperation<E = never> = (input: Endpoint13_4Input) => Effect.Effect<Endpoint13_4Output, E>
+export type Endpoint13_4Output = EffectValue<ReturnType<RawClient["server.form"]["form.reply"]>>
+export type FormReplyGlobalOperation<E = never> = (input: Endpoint13_4Input) => Effect.Effect<Endpoint13_4Output, E>
 
-type Endpoint13_5Request = Parameters<RawClient["server.form"]["session.form.reply"]>[0]
+type Endpoint13_5Request = Parameters<RawClient["server.form"]["form.cancel"]>[0]
 export type Endpoint13_5Input = {
-  readonly sessionID: Endpoint13_5Request["params"]["sessionID"]
   readonly formID: Endpoint13_5Request["params"]["formID"]
-  readonly answer: Endpoint13_5Request["payload"]["answer"]
+  readonly location?: Endpoint13_5Request["query"]["location"]
 }
-export type Endpoint13_5Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.reply"]>>
-export type FormReplyOperation<E = never> = (input: Endpoint13_5Input) => Effect.Effect<Endpoint13_5Output, E>
+export type Endpoint13_5Output = EffectValue<ReturnType<RawClient["server.form"]["form.cancel"]>>
+export type FormCancelGlobalOperation<E = never> = (input: Endpoint13_5Input) => Effect.Effect<Endpoint13_5Output, E>
 
-type Endpoint13_6Request = Parameters<RawClient["server.form"]["session.form.cancel"]>[0]
-export type Endpoint13_6Input = {
-  readonly sessionID: Endpoint13_6Request["params"]["sessionID"]
-  readonly formID: Endpoint13_6Request["params"]["formID"]
+type Endpoint13_6Request = Parameters<RawClient["server.form"]["session.form.list"]>[0]
+export type Endpoint13_6Input = { readonly sessionID: Endpoint13_6Request["params"]["sessionID"] }
+export type Endpoint13_6Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.list"]>>["data"]
+export type FormListOperation<E = never> = (input: Endpoint13_6Input) => Effect.Effect<Endpoint13_6Output, E>
+
+type Endpoint13_7Request = Parameters<RawClient["server.form"]["session.form.create"]>[0]
+export type Endpoint13_7Input = {
+  readonly sessionID: Endpoint13_7Request["params"]["sessionID"]
+  readonly id?: Endpoint13_7Request["payload"]["id"]
+  readonly title?: Endpoint13_7Request["payload"]["title"]
+  readonly metadata?: Endpoint13_7Request["payload"]["metadata"]
+  readonly mode: Endpoint13_7Request["payload"]["mode"]
+  readonly fields?: Endpoint13_7Request["payload"]["fields"]
+  readonly url?: Endpoint13_7Request["payload"]["url"]
 }
-export type Endpoint13_6Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.cancel"]>>
-export type FormCancelOperation<E = never> = (input: Endpoint13_6Input) => Effect.Effect<Endpoint13_6Output, E>
+export type Endpoint13_7Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.create"]>>["data"]
+export type FormCreateOperation<E = never> = (input: Endpoint13_7Input) => Effect.Effect<Endpoint13_7Output, E>
+
+type Endpoint13_8Request = Parameters<RawClient["server.form"]["session.form.get"]>[0]
+export type Endpoint13_8Input = {
+  readonly sessionID: Endpoint13_8Request["params"]["sessionID"]
+  readonly formID: Endpoint13_8Request["params"]["formID"]
+}
+export type Endpoint13_8Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.get"]>>["data"]
+export type FormGetOperation<E = never> = (input: Endpoint13_8Input) => Effect.Effect<Endpoint13_8Output, E>
+
+type Endpoint13_9Request = Parameters<RawClient["server.form"]["session.form.state"]>[0]
+export type Endpoint13_9Input = {
+  readonly sessionID: Endpoint13_9Request["params"]["sessionID"]
+  readonly formID: Endpoint13_9Request["params"]["formID"]
+}
+export type Endpoint13_9Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.state"]>>["data"]
+export type FormStateOperation<E = never> = (input: Endpoint13_9Input) => Effect.Effect<Endpoint13_9Output, E>
+
+type Endpoint13_10Request = Parameters<RawClient["server.form"]["session.form.reply"]>[0]
+export type Endpoint13_10Input = {
+  readonly sessionID: Endpoint13_10Request["params"]["sessionID"]
+  readonly formID: Endpoint13_10Request["params"]["formID"]
+  readonly answer: Endpoint13_10Request["payload"]["answer"]
+}
+export type Endpoint13_10Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.reply"]>>
+export type FormReplyOperation<E = never> = (input: Endpoint13_10Input) => Effect.Effect<Endpoint13_10Output, E>
+
+type Endpoint13_11Request = Parameters<RawClient["server.form"]["session.form.cancel"]>[0]
+export type Endpoint13_11Input = {
+  readonly sessionID: Endpoint13_11Request["params"]["sessionID"]
+  readonly formID: Endpoint13_11Request["params"]["formID"]
+}
+export type Endpoint13_11Output = EffectValue<ReturnType<RawClient["server.form"]["session.form.cancel"]>>
+export type FormCancelOperation<E = never> = (input: Endpoint13_11Input) => Effect.Effect<Endpoint13_11Output, E>
 
 export interface FormApi<E = never> {
   readonly listRequests: FormListRequestsOperation<E>
+  readonly createGlobal: FormCreateGlobalOperation<E>
+  readonly getGlobal: FormGetGlobalOperation<E>
+  readonly stateGlobal: FormStateGlobalOperation<E>
+  readonly replyGlobal: FormReplyGlobalOperation<E>
+  readonly cancelGlobal: FormCancelGlobalOperation<E>
   readonly list: FormListOperation<E>
   readonly create: FormCreateOperation<E>
   readonly get: FormGetOperation<E>

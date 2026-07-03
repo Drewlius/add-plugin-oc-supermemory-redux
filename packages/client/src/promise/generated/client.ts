@@ -93,6 +93,16 @@ import type {
   ProjectDirectoriesOutput,
   FormListRequestsInput,
   FormListRequestsOutput,
+  FormCreateGlobalInput,
+  FormCreateGlobalOutput,
+  FormGetGlobalInput,
+  FormGetGlobalOutput,
+  FormStateGlobalInput,
+  FormStateGlobalOutput,
+  FormReplyGlobalInput,
+  FormReplyGlobalOutput,
+  FormCancelGlobalInput,
+  FormCancelGlobalOutput,
   FormListInput,
   FormListOutput,
   FormCreateInput,
@@ -915,6 +925,76 @@ export function make(options: ClientOptions) {
             successStatus: 200,
             declaredStatuses: [401, 400],
             empty: false,
+          },
+          requestOptions,
+        ),
+      createGlobal: (input: FormCreateGlobalInput, requestOptions?: RequestOptions) =>
+        request<{ readonly data: FormCreateGlobalOutput }>(
+          {
+            method: "POST",
+            path: `/api/form`,
+            query: { location: input["location"] },
+            body: {
+              id: input["id"],
+              title: input["title"],
+              metadata: input["metadata"],
+              mode: input["mode"],
+              fields: input["fields"],
+              url: input["url"],
+              sessionID: input["sessionID"],
+            },
+            successStatus: 200,
+            declaredStatuses: [409, 400, 401],
+            empty: false,
+          },
+          requestOptions,
+        ).then((value) => value.data),
+      getGlobal: (input: FormGetGlobalInput, requestOptions?: RequestOptions) =>
+        request<{ readonly data: FormGetGlobalOutput }>(
+          {
+            method: "GET",
+            path: `/api/form/${encodeURIComponent(input.formID)}`,
+            query: { location: input["location"] },
+            successStatus: 200,
+            declaredStatuses: [404, 401, 400],
+            empty: false,
+          },
+          requestOptions,
+        ).then((value) => value.data),
+      stateGlobal: (input: FormStateGlobalInput, requestOptions?: RequestOptions) =>
+        request<{ readonly data: FormStateGlobalOutput }>(
+          {
+            method: "GET",
+            path: `/api/form/${encodeURIComponent(input.formID)}/state`,
+            query: { location: input["location"] },
+            successStatus: 200,
+            declaredStatuses: [404, 401, 400],
+            empty: false,
+          },
+          requestOptions,
+        ).then((value) => value.data),
+      replyGlobal: (input: FormReplyGlobalInput, requestOptions?: RequestOptions) =>
+        request<FormReplyGlobalOutput>(
+          {
+            method: "POST",
+            path: `/api/form/${encodeURIComponent(input.formID)}/reply`,
+            query: { location: input["location"] },
+            body: { answer: input["answer"] },
+            successStatus: 204,
+            declaredStatuses: [409, 400, 404, 401],
+            empty: true,
+          },
+          requestOptions,
+        ),
+      cancelGlobal: (input: FormCancelGlobalInput, requestOptions?: RequestOptions) =>
+        request<FormCancelGlobalOutput>(
+          {
+            method: "POST",
+            path: `/api/form/${encodeURIComponent(input.formID)}/cancel`,
+            query: { location: input["location"] },
+            successStatus: 204,
+            declaredStatuses: [409, 404, 401, 400],
+            empty: true,
           },
           requestOptions,
         ),

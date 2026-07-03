@@ -5554,13 +5554,14 @@ export type ProjectCurrent = {
   directory: string
 }
 
-export type FormCreatePayload = {
+export type FormCreateGlobalPayload = {
   id?: string
   title?: string
   metadata?: FormMetadata
   mode: "form" | "url"
   fields?: Array<FormStringField | FormNumberField | FormIntegerField | FormBooleanField | FormMultiselectField>
   url?: string
+  sessionID: string
 }
 
 export type FormState =
@@ -5577,6 +5578,15 @@ export type FormState =
 
 export type FormReply = {
   answer: FormAnswer
+}
+
+export type FormCreatePayload = {
+  id?: string
+  title?: string
+  metadata?: FormMetadata
+  mode: "form" | "url"
+  fields?: Array<FormStringField | FormNumberField | FormIntegerField | FormBooleanField | FormMultiselectField>
+  url?: string
 }
 
 export type PermissionV2Request = {
@@ -9751,7 +9761,7 @@ export type FormUrlInfo2 = {
   url: string
 }
 
-export type FormCreatePayload2 = {
+export type FormCreateGlobalPayload2 = {
   id?: string | null
   title?: string
   metadata?: FormMetadata2
@@ -9760,6 +9770,7 @@ export type FormCreatePayload2 = {
     FormStringField2 | FormNumberField3 | FormIntegerField3 | FormBooleanField2 | FormMultiselectField2
   > | null
   url?: string | null
+  sessionID: string
 }
 
 export type FormNotFoundErrorV2 = {
@@ -9810,6 +9821,17 @@ export type FormInvalidAnswerErrorV2 = {
   _tag: "FormInvalidAnswerError"
   id: string
   message: string
+}
+
+export type FormCreatePayload2 = {
+  id?: string | null
+  title?: string
+  metadata?: FormMetadata2
+  mode: "form" | "url"
+  fields?: Array<
+    FormStringField2 | FormNumberField3 | FormIntegerField3 | FormBooleanField2 | FormMultiselectField2
+  > | null
+  url?: string | null
 }
 
 export type PermissionV2Source2 = {
@@ -17892,6 +17914,218 @@ export type V2FormRequestListResponses = {
 }
 
 export type V2FormRequestListResponse = V2FormRequestListResponses[keyof V2FormRequestListResponses]
+
+export type V2FormCreateData = {
+  body: FormCreateGlobalPayload2
+  path?: never
+  query?: {
+    location?: {
+      directory?: string | null
+      workspace?: string | null
+    } | null
+  }
+  url: "/api/form"
+}
+
+export type V2FormCreateErrors = {
+  /**
+   * InvalidRequestError
+   */
+  400: InvalidRequestError1 | InvalidRequestErrorV2
+  /**
+   * UnauthorizedError
+   */
+  401: UnauthorizedErrorV2
+  /**
+   * ConflictError
+   */
+  409: ConflictErrorV2
+}
+
+export type V2FormCreateError = V2FormCreateErrors[keyof V2FormCreateErrors]
+
+export type V2FormCreateResponses = {
+  /**
+   * Success
+   */
+  200: {
+    data: FormFormInfo2 | FormUrlInfo2
+  }
+}
+
+export type V2FormCreateResponse = V2FormCreateResponses[keyof V2FormCreateResponses]
+
+export type V2FormGetData = {
+  body?: never
+  path: {
+    formID: string
+  }
+  query?: {
+    location?: {
+      directory?: string | null
+      workspace?: string | null
+    } | null
+  }
+  url: "/api/form/{formID}"
+}
+
+export type V2FormGetErrors = {
+  /**
+   * InvalidRequestError
+   */
+  400: InvalidRequestErrorV2
+  /**
+   * UnauthorizedError
+   */
+  401: UnauthorizedErrorV2
+  /**
+   * FormNotFoundError
+   */
+  404: FormNotFoundErrorV2
+}
+
+export type V2FormGetError = V2FormGetErrors[keyof V2FormGetErrors]
+
+export type V2FormGetResponses = {
+  /**
+   * Success
+   */
+  200: {
+    data: FormFormInfo2 | FormUrlInfo2
+  }
+}
+
+export type V2FormGetResponse = V2FormGetResponses[keyof V2FormGetResponses]
+
+export type V2FormStateData = {
+  body?: never
+  path: {
+    formID: string
+  }
+  query?: {
+    location?: {
+      directory?: string | null
+      workspace?: string | null
+    } | null
+  }
+  url: "/api/form/{formID}/state"
+}
+
+export type V2FormStateErrors = {
+  /**
+   * InvalidRequestError
+   */
+  400: InvalidRequestErrorV2
+  /**
+   * UnauthorizedError
+   */
+  401: UnauthorizedErrorV2
+  /**
+   * FormNotFoundError
+   */
+  404: FormNotFoundErrorV2
+}
+
+export type V2FormStateError = V2FormStateErrors[keyof V2FormStateErrors]
+
+export type V2FormStateResponses = {
+  /**
+   * Success
+   */
+  200: {
+    data: FormState2
+  }
+}
+
+export type V2FormStateResponse = V2FormStateResponses[keyof V2FormStateResponses]
+
+export type V2FormReplyData = {
+  body: FormReply2
+  path: {
+    formID: string
+  }
+  query?: {
+    location?: {
+      directory?: string | null
+      workspace?: string | null
+    } | null
+  }
+  url: "/api/form/{formID}/reply"
+}
+
+export type V2FormReplyErrors = {
+  /**
+   * FormInvalidAnswerError | InvalidRequestError
+   */
+  400: FormInvalidAnswerErrorV2 | InvalidRequestErrorV2
+  /**
+   * UnauthorizedError
+   */
+  401: UnauthorizedErrorV2
+  /**
+   * FormNotFoundError
+   */
+  404: FormNotFoundErrorV2
+  /**
+   * FormAlreadySettledError
+   */
+  409: FormAlreadySettledErrorV2
+}
+
+export type V2FormReplyError = V2FormReplyErrors[keyof V2FormReplyErrors]
+
+export type V2FormReplyResponses = {
+  /**
+   * <No Content>
+   */
+  204: void
+}
+
+export type V2FormReplyResponse = V2FormReplyResponses[keyof V2FormReplyResponses]
+
+export type V2FormCancelData = {
+  body?: never
+  path: {
+    formID: string
+  }
+  query?: {
+    location?: {
+      directory?: string | null
+      workspace?: string | null
+    } | null
+  }
+  url: "/api/form/{formID}/cancel"
+}
+
+export type V2FormCancelErrors = {
+  /**
+   * InvalidRequestError
+   */
+  400: InvalidRequestErrorV2
+  /**
+   * UnauthorizedError
+   */
+  401: UnauthorizedErrorV2
+  /**
+   * FormNotFoundError
+   */
+  404: FormNotFoundErrorV2
+  /**
+   * FormAlreadySettledError
+   */
+  409: FormAlreadySettledErrorV2
+}
+
+export type V2FormCancelError = V2FormCancelErrors[keyof V2FormCancelErrors]
+
+export type V2FormCancelResponses = {
+  /**
+   * <No Content>
+   */
+  204: void
+}
+
+export type V2FormCancelResponse = V2FormCancelResponses[keyof V2FormCancelResponses]
 
 export type V2SessionFormListData = {
   body?: never

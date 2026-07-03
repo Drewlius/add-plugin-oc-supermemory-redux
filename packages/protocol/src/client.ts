@@ -70,6 +70,11 @@ export const endpointNames = {
   "permission.saved.list": "listSaved",
   "permission.saved.remove": "removeSaved",
   "form.request.list": "listRequests",
+  "form.create": "createGlobal",
+  "form.get": "getGlobal",
+  "form.state": "stateGlobal",
+  "form.reply": "replyGlobal",
+  "form.cancel": "cancelGlobal",
   "question.request.list": "listRequests",
 } as const
 

@@ -76,6 +76,7 @@ import type {
   FindTextResponses,
   FormatterStatusErrors,
   FormatterStatusResponses,
+  FormCreateGlobalPayload2,
   FormCreatePayload2,
   FormReply2,
   GlobalConfigGetErrors,
@@ -280,8 +281,18 @@ import type {
   V2EventChangesResponses,
   V2EventSubscribeErrors,
   V2EventSubscribeResponses,
+  V2FormCancelErrors,
+  V2FormCancelResponses,
+  V2FormCreateErrors,
+  V2FormCreateResponses,
+  V2FormGetErrors,
+  V2FormGetResponses,
+  V2FormReplyErrors,
+  V2FormReplyResponses,
   V2FormRequestListErrors,
   V2FormRequestListResponses,
+  V2FormStateErrors,
+  V2FormStateResponses,
   V2FsFindErrors,
   V2FsFindResponses,
   V2FsListErrors,
@@ -7071,6 +7082,183 @@ export class Request extends HeyApiClient {
 }
 
 export class Form2 extends HeyApiClient {
+  /**
+   * Create form
+   *
+   * Create a form owned by an arbitrary session identifier.
+   */
+  public create<ThrowOnError extends boolean = false>(
+    parameters: {
+      location?: {
+        directory?: string | null
+        workspace?: string | null
+      } | null
+      formCreateGlobalPayload: FormCreateGlobalPayload2
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "location" },
+            { key: "formCreateGlobalPayload", map: "body" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<V2FormCreateResponses, V2FormCreateErrors, ThrowOnError>({
+      url: "/api/form",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Get form
+   *
+   * Retrieve a form by ID.
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters: {
+      formID: string
+      location?: {
+        directory?: string | null
+        workspace?: string | null
+      } | null
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "formID" },
+            { in: "query", key: "location" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<V2FormGetResponses, V2FormGetErrors, ThrowOnError>({
+      url: "/api/form/{formID}",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get form state
+   *
+   * Retrieve the current state for a form.
+   */
+  public state<ThrowOnError extends boolean = false>(
+    parameters: {
+      formID: string
+      location?: {
+        directory?: string | null
+        workspace?: string | null
+      } | null
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "formID" },
+            { in: "query", key: "location" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<V2FormStateResponses, V2FormStateErrors, ThrowOnError>({
+      url: "/api/form/{formID}/state",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Reply to form
+   *
+   * Submit an answer to a pending form.
+   */
+  public reply<ThrowOnError extends boolean = false>(
+    parameters: {
+      formID: string
+      location?: {
+        directory?: string | null
+        workspace?: string | null
+      } | null
+      formReply: FormReply2
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "formID" },
+            { in: "query", key: "location" },
+            { key: "formReply", map: "body" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<V2FormReplyResponses, V2FormReplyErrors, ThrowOnError>({
+      url: "/api/form/{formID}/reply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Cancel form
+   *
+   * Cancel a pending form.
+   */
+  public cancel<ThrowOnError extends boolean = false>(
+    parameters: {
+      formID: string
+      location?: {
+        directory?: string | null
+        workspace?: string | null
+      } | null
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "formID" },
+            { in: "query", key: "location" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<V2FormCancelResponses, V2FormCancelErrors, ThrowOnError>({
+      url: "/api/form/{formID}/cancel",
+      ...options,
+      ...params,
+    })
+  }
+
   private _request?: Request
   get request(): Request {
     return (this._request ??= new Request({ client: this.client }))
